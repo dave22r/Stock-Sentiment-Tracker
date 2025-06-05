@@ -15,7 +15,7 @@ Stock Sentiment Tracker allows users to:
 - Visualize top sentiment-driving posts
 - See 7-day price movement (limited support)
 
-It’s designed for curious investors, student devs, and anyone interested in blending NLP, scraping, and data visualization to decode market hype.
+It’s designed to predict how a stock is going to behave solely based on public sentiment and news.
 
 ---
 
