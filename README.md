@@ -19,9 +19,9 @@ It’s designed for curious investors, student devs, and anyone interested in bl
 
 ---
 
-## 🚀 Live Demo
+## Status
 
-> _(Optional: Add a link here if deploying to Vercel/Railway in the future)_
+Functional but a work in progress........
 
 ---
 
