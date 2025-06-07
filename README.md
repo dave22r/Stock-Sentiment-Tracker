@@ -1,72 +1,74 @@
-
 # 📊 Stock Sentiment Tracker
 
-A full-stack stock sentiment visualization tool that combines Reddit and News sentiment, Yahoo Finance data, and price history to predict short-term market sentiment. Built using React, Node.js, Puppeteer, and external APIs.
+A full-stack sentiment analytics dashboard for retail traders and finance nerds. Pulls real-time sentiment from Reddit, financial news sources, and price history to predict short-term price movement — with added market indicators like SMA, RSI, Bollinger Bands, and volatility.
+
+Built with React, Node.js, and Chart.js — designed for clarity, performance, and a bit of flair.
 
 ---
 
 ## 🌟 Overview
 
-Stock Sentiment Tracker allows users to:
+The Stock Sentiment Tracker helps users:
 
-- Add stocks (with custom aliases)
-- Analyze live Reddit and news sentiment
-- View simplified trend predictions
-- Visualize top sentiment-driving posts
-- See 7-day price movement (limited support)
+- Analyze Reddit and News sentiment around any stock
+- View simplified bullish/bearish predictions
+- Visualize sentiment-driving Reddit posts
+- Track price charts and trend shifts
+- See technical indicators like RSI, volatility, and Bollinger Bands
 
-It’s designed to predict how a stock is going to behave solely based on public sentiment and news.
-
----
-
-## Status
-
-Functional but a work in progress........
+It blends social data with price analytics to decode how markets "feel" — and where they might go next.
 
 ---
 
-## 🧠 Features
+## 🧠 Key Features
 
-### ✅ Add Custom Stocks
-- Add tickers like `$TSLA` with aliases like “Tesla”
-- Auto-deduplicates and validates inputs
+### ✅ Custom Stock Support
+- Add tickers like `$NVDA`, `$TSLA`, or `$GME` with optional aliases
+- Smart validation and deduplication
 
-### 📰 Real-Time Sentiment
-- Scrapes Reddit (via Snoowrap) and News (via NewsAPI)  
-- Filters out irrelevant results (e.g., AMC theatres vs. AMC stock)
-- Uses `sentiment` package to score text from -5 (very negative) to +5 (very positive)
+### 📰 Live Sentiment Scraping
+- Pulls Reddit posts from top finance subs (`wallstreetbets`, `stocks`, etc.)
+- Uses NewsAPI for headline sentiment
+- Filters noise (e.g. “AMC theatre” ≠ $AMC stock)
+- Sentiment scored with AFINN-based NLP (from -5 to +5)
 
-### 📉 Price Trend Calculation
-- Pulls 7-day price data from Yahoo Finance
-- Computes % change and maps it to sentiment scale
-
-### 🧪 Prediction Logic
-- Weighted formula combining Reddit (30%), News (60%), and Historical (10%)
+### 📉 Predictive Model
+- Combines sentiment + 7-day price trend:
+  - Reddit (30%)
+  - News (60%)
+  - Historical movement (10%)
 - Outputs simple prediction: `Uptick`, `Neutral`, or `Downtick`
 
-### 📊 Visual Dashboard
-- React frontend with Chart.js
-- Bar graphs of sentiment breakdown
-- Line charts for supported stocks (e.g., $TSLA)
-- Top Reddit posts with preview, subreddit, and score
+### 📈 Technical Indicators (🧪)
+Each stock comes with:
+- **SMA 20 & SMA 50** (Simple Moving Averages)
+- **RSI** (Relative Strength Index)
+- **Bollinger Bands**
+- **Annualized Volatility** based on daily return variance
+
+### 📊 Visual Dashboards
+- **Sentiment breakdown** with bar charts
+- **30-day price trends** with smoothing
+- **Overlayed indicators** on price graphs
+- Top Reddit posts with subreddit, preview, and sentiment
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer        | Tools                                     |
-|--------------|-------------------------------------------|
-| Frontend     | React, Chart.js, Axios, CSS Modules       |
-| Backend      | Node.js, Express, Snoowrap, Puppeteer     |
-| Data Sources | Reddit API, NewsAPI, Yahoo Finance API    |
-| NLP          | Sentiment (AFINN-based scoring)           |
-| Caching      | `node-cache` (5-minute expiry)            |
+| Layer        | Tech                                             |
+|--------------|--------------------------------------------------|
+| Frontend     | React, Chart.js, Axios, custom CSS               |
+| Backend      | Node.js, Express, Snoowrap, Puppeteer            |
+| Data Sources | Reddit API, NewsAPI, Yahoo Finance               |
+| NLP          | `sentiment` (AFINN-based scoring)                |
+| Caching      | `node-cache` (5–10 min TTL)                      |
 
 ---
 
-## 📦 Local Setup
+## 🚀 Local Setup
 
-1. **Clone repo**
+1. **Clone the repo**
 ```bash
 git clone https://github.com/yourusername/stock-sentiment-tracker
 cd stock-sentiment-tracker
