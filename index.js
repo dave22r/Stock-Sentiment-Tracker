@@ -37,11 +37,11 @@ let stockMap = {
 };
 
 const excludeKeywords = ['theater', 'movie', 'cinema', 'amc 10', 'amc 12', 'satellite', 'tv', 'aops', 'employee', 'ape', 'BBY', 'Best Buy'];
-const financeSubreddits = 'wallstreetbets+stocks+investing+options+StockMarket+pennystocks+Superstonk+Trading';
+const financeSubreddits = 'wallstreetbets+stocks+investing+options+StockMarket+Superstonk+pennystocks+Trading';
 
 const sourceWeights = {
-  news: 0.6,
-  reddit: 0.3,
+  news: 0.5,
+  reddit: 0.4,
   historical: 0.1
 };
 
@@ -112,7 +112,7 @@ function calculateBollingerBands(prices, period = 20, stdDev = 2) {
 async function calculateCorrelation(ticker1, ticker2, period = 30) {
   try {
     const endDate = new Date();
-    const startDate = new Date(endDate - period * 24 * 60 * 60 * 1000);
+    const startDate = new Date(endDate - 90 * 24 * 60 * 60 * 1000);
     
     const [prices1, prices2] = await Promise.all([
       yahooFinance.historical(ticker1, { period1: startDate, period2: endDate, interval: '1d' }),
@@ -185,10 +185,13 @@ async function getRedditSentiment(stock, aliases) {
       const title = p.title.toLowerCase();
       const hasStock = [stock, ...aliases].some(alias => {
         const aliasLower = alias.toLowerCase();
-        return title.includes(aliasLower) || text.includes(aliasLower);
+        // Loosen regex for $BB
+        const regex = stock === '$BB' ? new RegExp(`\\b(${aliasLower}|blackberry)\\b`) : new RegExp(`\\b${aliasLower}\\b`);
+        return regex.test(title) || regex.test(text);
       });
       const hasExclude = stock === '$BB' ? false : excludeKeywords.some(keyword => text.includes(keyword.toLowerCase()));
       const isValidSub = !p.subreddit.display_name.startsWith('u_');
+      console.log(`Post for ${stock}: ${p.title}, Included: ${hasStock && !hasExclude && isValidSub}`);
       return hasStock && !hasExclude && isValidSub;
     });
 
@@ -208,35 +211,50 @@ async function getRedditSentiment(stock, aliases) {
         const title = p.title.toLowerCase();
         const hasStock = [stock, ...aliases].some(alias => {
           const aliasLower = alias.toLowerCase();
-          return title.includes(aliasLower) || text.includes(aliasLower);
+          const regex = stock === '$BB' ? new RegExp(`\\b(${aliasLower}|blackberry)\\b`) : new RegExp(`\\b${aliasLower}\\b`);
+          return regex.test(title) || regex.test(text);
         });
         const hasExclude = stock === '$BB' ? false : excludeKeywords.some(keyword => text.includes(keyword.toLowerCase()));
         const isValidSub = !p.subreddit.display_name.startsWith('u_');
+        console.log(`Search post for ${stock}: ${p.title}, Included: ${hasStock && !hasExclude && isValidSub}`);
         return hasStock && !hasExclude && isValidSub;
       })];
     }
 
-    // Removed fake $BB posts - let it return empty if no posts found
-
     const sentiment = new Sentiment();
+    const bearishKeywords = ['bearish', 'put', 'crash', 'drop', 'decline', 'fall', 'short'];
     const scores = stockPosts.map(p => {
-      const score = sentiment.analyze(p.title + ' ' + (p.selftext || '')).score;
+      const title = p.title.toLowerCase();
+      const body = (p.selftext || '').toLowerCase();
+      let titleScore = sentiment.analyze(p.title).score * 0.7;
+      let bodyScore = sentiment.analyze(p.selftext || '').score * 0.3;
+      if (bearishKeywords.some(k => title.includes(k) || body.includes(k))) {
+        titleScore = Math.max(-5, titleScore - 2);
+        bodyScore = Math.max(-5, bodyScore - 2);
+      }
+      const score = titleScore + bodyScore;
       return Math.max(-5, Math.min(5, score));
     });
 
     return {
-      sentiment: scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0,
+      sentiment: scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null,
       count: stockPosts.length,
-      posts: stockPosts.slice(0, 3).map(p => ({
-        title: p.title,
-        subreddit: p.subreddit.display_name,
-        sentiment: Math.max(-5, Math.min(5, sentiment.analyze(p.title + ' ' + (p.selftext || '')).score)),
-        textPreview: (p.selftext || '').slice(0, 100) + (p.selftext && p.selftext.length > 100 ? '...' : '')
-      }))
+      posts: stockPosts.slice(0, 3).map(p => {
+        let postScore = sentiment.analyze(p.title + ' ' + (p.selftext || '')).score;
+        if (bearishKeywords.some(k => p.title.toLowerCase().includes(k) || (p.selftext || '').toLowerCase().includes(k))) {
+          postScore = Math.max(-5, postScore - 2);
+        }
+        return {
+          title: p.title,
+          subreddit: p.subreddit.display_name,
+          sentiment: Math.max(-5, Math.min(5, postScore)),
+          textPreview: (p.selftext || '').slice(0, 100) + (p.selftext && p.selftext.length > 100 ? '...' : '')
+        };
+      })
     };
   } catch (error) {
     console.error(`Reddit error for ${stock}:`, error.message);
-    return { sentiment: 0, count: 0, posts: [] };
+    return { sentiment: null, count: 0, posts: [] };
   }
 }
 
@@ -272,7 +290,7 @@ async function getStockAnalytics(ticker) {
   try {
     const cleanTicker = ticker.replace('$', '');
     const endDate = new Date();
-    const startDate = new Date(endDate - 60 * 24 * 60 * 60 * 1000); // 60 days for better analytics
+    const startDate = new Date(endDate - 120 * 24 * 60 * 60 * 1000); // 120 days
     
     const prices = await yahooFinance.historical(cleanTicker, {
       period1: startDate,
@@ -483,10 +501,6 @@ app.get('/hype/:ticker', async (req, res) => {
     res.status(500).json({ error: 'API failed', details: error.message });
   }
 });
-
-app.get('/', (req, res) => res.send('Stock Sentiment Tracker live, G!'));
-
-app.listen(3000, () => console.log('Running on 3000'));
 
 app.get('/', (req, res) => res.send('Stock Sentiment Tracker live, G!'));
 
