@@ -6,7 +6,7 @@ Built with React, Node.js, and Chart.js — designed for clarity, performance, a
 
 ---
 
-## 🌟 Overview
+##  Overview
 
 The Stock Sentiment Tracker helps users:
 
@@ -20,33 +20,33 @@ It blends social data with price analytics to decode how markets "feel" — and 
 
 ---
 
-## 🧠 Key Features
+##  Key Features
 
-### ✅ Custom Stock Support
+###  Custom Stock Support
 - Add tickers like `$NVDA`, `$TSLA`, or `$GME` with optional aliases
 - Smart validation and deduplication
 
-### 📰 Live Sentiment Scraping
+### Live Sentiment Scraping
 - Pulls Reddit posts from top finance subs (`wallstreetbets`, `stocks`, etc.)
 - Uses NewsAPI for headline sentiment
 - Filters noise (e.g. “AMC theatre” ≠ $AMC stock)
 - Sentiment scored with AFINN-based NLP (from -5 to +5)
 
-### 📉 Predictive Model
+### Predictive Model
 - Combines sentiment + 7-day price trend:
   - Reddit (30%)
   - News (60%)
   - Historical movement (10%)
 - Outputs simple prediction: `Uptick`, `Neutral`, or `Downtick`
 
-### 📈 Technical Indicators (🧪)
+### Technical Indicators
 Each stock comes with:
 - **SMA 20 & SMA 50** (Simple Moving Averages)
 - **RSI** (Relative Strength Index)
 - **Bollinger Bands**
 - **Annualized Volatility** based on daily return variance
 
-### 📊 Visual Dashboards
+### Visual Dashboards
 - **Sentiment breakdown** with bar charts
 - **30-day price trends** with smoothing
 - **Overlayed indicators** on price graphs
@@ -54,7 +54,7 @@ Each stock comes with:
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer        | Tech                                             |
 |--------------|--------------------------------------------------|
@@ -66,7 +66,7 @@ Each stock comes with:
 
 ---
 
-## 🚀 Local Setup
+## Local Setup
 
 1. **Clone the repo**
 ```bash
