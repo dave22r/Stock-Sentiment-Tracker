@@ -53,6 +53,9 @@ Each stock comes with:
 - Top Reddit posts with subreddit, preview, and sentiment
 
 ---
+## Watch a demonstration here:
+
+https://youtu.be/Dkybpi6WYDc
 
 ## Tech Stack
 
@@ -65,6 +68,7 @@ Each stock comes with:
 | Caching      | `node-cache` (5–10 min TTL)                      |
 
 ---
+
 
 ## Local Setup
 
